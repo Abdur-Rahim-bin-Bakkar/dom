@@ -141,3 +141,101 @@ button.removeEventListener("click", handleClick);
 - **Keyboard**: `keydown`, `keyup`, `keypress`
 - **Form**: `submit`, `change`, `focus`, `blur`, `input`
 - **Document/Window**: `DOMContentLoaded`, `load`, `resize`, `scroll`
+
+---
+
+## 🚀 Advanced Event Handling
+
+### Event Propagation (Bubbling & Capturing)
+When an event happens on an element, it first runs the handlers on it, then on its parent, then all the way up on other ancestors. This is called **Event Bubbling**.
+- **`event.stopPropagation()`**: Stops the event from bubbling up the DOM tree.
+- **`event.preventDefault()`**: Prevents the browser's default behavior (like following a link or submitting a form).
+
+### Event Delegation
+Instead of adding an event listener to every single child element (which is bad for performance and memory), you can add a single event listener to a parent element and use `event.target` to figure out which child triggered the event.
+
+```javascript
+const list = document.querySelector("ul");
+
+list.addEventListener("click", function(event) {
+    if (event.target.tagName === "LI") {
+        console.log("List item clicked:", event.target.innerText);
+    }
+});
+```
+
+---
+
+## 💾 Data Attributes (Dataset)
+
+HTML5 allows you to store extra information in standard HTML elements without other hacks like non-standard attributes. These are prefixed with `data-`.
+
+```html
+<article id="electric-cars" data-columns="3" data-index-number="12314">
+  ...
+</article>
+```
+
+You can access these in JavaScript using the `dataset` property:
+```javascript
+const article = document.getElementById("electric-cars");
+
+console.log(article.dataset.columns); // "3"
+console.log(article.dataset.indexNumber); // "12314" (CamelCase is used in JS)
+
+// Updating a data attribute
+article.dataset.columns = "4";
+```
+
+---
+
+## ⚡ Performance: Reflow, Repaint, and DocumentFragment
+
+### Reflow and Repaint
+Every time you change the DOM, the browser has to recalculate styles and positions (**Reflow**) and redraw the pixels on the screen (**Repaint**). Doing this too often in a loop will slow down your application.
+
+### DocumentFragment
+To avoid triggering multiple reflows, use a `DocumentFragment`. It is a lightweight version of a Document that stores DOM structure in memory. Since it's not attached to the active DOM tree, changes made to it don't affect the document or cause reflow.
+
+```javascript
+const list = document.getElementById("myList");
+const fragment = document.createDocumentFragment();
+const fruits = ['Apple', 'Banana', 'Mango'];
+
+fruits.forEach(fruit => {
+    const li = document.createElement("li");
+    li.textContent = fruit;
+    fragment.appendChild(li); // Appends to memory, no reflow
+});
+
+// Append the fragment to the DOM all at once (triggers 1 reflow)
+list.appendChild(fragment); 
+```
+
+---
+
+## 🏗️ Understanding Node Types
+
+Everything in the DOM is a **Node**, but not all nodes are **Elements**. There are 12 node types, but here are the most common ones you'll interact with:
+
+1. **`Node.ELEMENT_NODE` (1)**: An Element node such as `<p>` or `<div>`.
+2. **`Node.TEXT_NODE` (3)**: The actual text inside an Element or Attribute.
+3. **`Node.COMMENT_NODE` (8)**: An HTML comment `<!-- ... -->`.
+4. **`Node.DOCUMENT_NODE` (9)**: The root node of the document.
+5. **`Node.DOCUMENT_FRAGMENT_NODE` (11)**: A lightweight document object.
+
+You can check a node's type using the `nodeType` property:
+```javascript
+const paragraph = document.querySelector("p");
+console.log(paragraph.nodeType === Node.ELEMENT_NODE); // true
+```
+
+---
+
+## 🌐 BOM vs DOM
+
+While learning the DOM, you will often hear about the BOM.
+- **DOM (Document Object Model)**: Deals with the web page content and structure (`document`).
+- **BOM (Browser Object Model)**: Deals with browser components outside of the document itself (`window`). This includes `window.innerHeight`, `window.location`, `navigator`, `localStorage`, and `setTimeout`.
+
+The `document` object is actually a property of the `window` object (`window.document`).
